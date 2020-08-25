@@ -1,14 +1,15 @@
 language: php
 
-php:
-  - 7.4
-  - 7.3
-  - 7.2
-  - 7.1
+services:
+  - docker
 
 before_install:
-  - composer update -n
+  - docker run --rm -v "$(pwd)":/var/www -t phpswoole/swoole:latest-dev composer install -n
 
 script:
   - set -e
-  - ./vendor/bin/phpcs -v --standard=PSR12 src
+  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.1 parallel-lint src
+  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.2 parallel-lint src
+  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.3 parallel-lint src
+  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 parallel-lint src
+  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 phpcs -v --standard=PSR12 src
