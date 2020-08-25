@@ -1,0 +1,14 @@
+language: php
+
+php:
+  - 7.4
+  - 7.3
+  - 7.2
+  - 7.1
+
+before_install:
+  - composer update -n
+
+script:
+  - set -e
+  - ./vendor/bin/phpcs -v --standard=PSR12 src
