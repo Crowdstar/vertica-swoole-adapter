@@ -4,12 +4,16 @@ services:
   - docker
 
 before_install:
+  - docker-compose up -d
+  - docker ps -a
   - docker run --rm -v "$(pwd)":/var/www -t phpswoole/swoole:latest-dev composer install -n
 
 script:
   - set -e
-  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.1 parallel-lint src
-  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.2 parallel-lint src
-  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.3 parallel-lint src
-  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 parallel-lint src
-  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 phpcs -v --standard=PSR12 src
+  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.1 parallel-lint examples src tests
+  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.2 parallel-lint examples src tests
+  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.3 parallel-lint examples src tests
+  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 parallel-lint examples src tests
+  - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 phpcs -v --standard=PSR12 examples src tests
+  - docker exec -t $(docker ps -qf "name=app") ./vendor/bin/phpunit
+

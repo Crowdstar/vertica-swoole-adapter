@@ -16,7 +16,8 @@ Features supported:
 
 Vertica connections are made through package [skatrych/vertica-php-adapter](https://github.com/skatrych/vertica-php-adapter), which is implemented using ODBC.
 
-This package was derived from our work at [Glu Mobile](https://www.glu.com). It has been used in one of our internal microservices, and ran smoothly for months.
+This package was derived from our work at [Glu Mobile](https://www.glu.com). It has been used in one of our internal microservices talking to Vertica 7.2.0
+and 9.3.0 servers, and ran smoothly for months.
 
 # Installation
 
@@ -47,4 +48,18 @@ $conn = $pool->get();
 $data = $conn->fetchAll($conn->query($sql)) ?: [];
 $pool->put($conn);
 ?>
+```
+
+For more examples, please check source code under folder _examples/_. To run the examples, you will need to run
+following two commands first to install Composer packages and start Docker containers:
+
+```bash
+docker run --rm -v $(pwd):/var/www -ti phpswoole/swoole:latest-dev composer update -n
+docker-compose up --build -d # or "docker-compose up -d" if you don't need to rebuild the image.
+```
+
+Once done, you can run the example(s) using following command(s):
+
+```bash
+docker exec -ti $(docker ps -qf "name=app") ./examples/example0.php # To run example ./examples/example0.php.
 ```
