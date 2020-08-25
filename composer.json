@@ -1,0 +1,34 @@
+{
+    "name": "crowdstar/vertica-swoole-adapter",
+    "description": "Provides a Db layer for Swoole-based application to communicate to HP Vertica databases.",
+    "keywords": [
+        "vertica",
+        "swoole"
+    ],
+    "homepage": "https://www.glu.com",
+    "license": "Apache-2.0",
+    "type": "library",
+    "require": {
+        "php": ">=7.1",
+        "ext-swoole": ">=4.4",
+        "crowdstar/exponential-backoff": "~3.0.0",
+        "skatrych/vertica-php-adapter": "@dev"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "~7.0",
+        "swoole/ide-helper": "@dev"
+    },
+    "suggest": {
+        "monolog/monolog": "Allow to log errors for debugging purpose."
+    },
+    "autoload": {
+        "psr-4": {
+            "CrowdStar\\VerticaSwooleAdapter\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "CrowdStar\\Tests\\VerticaSwooleAdapter\\": "tests/unit/"
+        }
+    }
+}
