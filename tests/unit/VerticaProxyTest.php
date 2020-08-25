@@ -22,7 +22,9 @@ namespace CrowdStar\Tests\VerticaSwooleAdapter;
 
 use CrowdStar\VerticaSwooleAdapter\VerticaAdapter;
 use CrowdStar\VerticaSwooleAdapter\VerticaProxy;
+use Exception;
 use PHPUnit\Framework\TestCase;
+use Psr\Log\Test\TestLogger;
 use Swoole\ConnectionPool;
 use Swoole\Coroutine;
 
@@ -39,21 +41,7 @@ class VerticaProxyTest extends TestCase
     public function testConnectionPool(): void
     {
         Coroutine\run(function () {
-            $pool = new ConnectionPool(
-                function () {
-                    return new VerticaAdapter(
-                        [
-                            'host'     => $_ENV['VERTICA_HOST'],
-                            'port'     => $_ENV['VERTICA_PORT'],
-                            'user'     => $_ENV['VERTICA_USER'],
-                            'password' => $_ENV['VERTICA_PASS'],
-                            'database' => $_ENV['VERTICA_DB'],
-                        ]
-                    );
-                },
-                ConnectionPool::DEFAULT_SIZE,
-                VerticaProxy::class
-            );
+            $pool = $this->getPool();
 
             /** @var VerticaAdapter $conn */
             $conn = $pool->get();
@@ -61,6 +49,58 @@ class VerticaProxyTest extends TestCase
             $pool->put($conn);
 
             self::assertRegExp("/Vertica Analytic Database v\d+\.\d+\.\d+\-\d+/", $data[0]['version']);
+
+            $pool->close();
         });
+    }
+    /**
+     * @covers VerticaProxy::reconnect
+     */
+    public function testLogging(): void
+    {
+        Coroutine\run(function () {
+            $pool   = $this->getPool();
+            $logger = new TestLogger();
+
+            /** @var VerticaProxy $conn */
+            $conn = $pool->get();
+            $conn->setLogger($logger);
+
+            $conn->reconnect(new Exception('connection broken', 1234));
+            $pool->put($conn);
+
+            $pool->close();
+
+            self::assertTrue(
+                $logger->hasError(
+                    [
+                        'message' => 'Reconnecting to Vertica due to: connection broken',
+                        'context' => [
+                            'code'  => 1234,
+                            'class' => Exception::class,
+                        ],
+                    ]
+                )
+            );
+        });
+    }
+
+    protected function getPool(): ConnectionPool
+    {
+        return new ConnectionPool(
+            function () {
+                return new VerticaAdapter(
+                    [
+                        'host'     => $_ENV['VERTICA_HOST'],
+                        'port'     => $_ENV['VERTICA_PORT'],
+                        'user'     => $_ENV['VERTICA_USER'],
+                        'password' => $_ENV['VERTICA_PASS'],
+                        'database' => $_ENV['VERTICA_DB'],
+                    ]
+                );
+            },
+            ConnectionPool::DEFAULT_SIZE,
+            VerticaProxy::class
+        );
     }
 }

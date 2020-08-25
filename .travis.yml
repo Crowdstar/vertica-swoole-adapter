@@ -16,4 +16,3 @@ script:
   - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 parallel-lint examples src tests
   - docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 phpcs -v --standard=PSR12 examples src tests
   - docker exec -t $(docker ps -qf "name=app") ./vendor/bin/phpunit
-

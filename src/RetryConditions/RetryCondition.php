@@ -20,7 +20,6 @@ declare(strict_types=1);
 
 namespace CrowdStar\VerticaSwooleAdapter\RetryConditions;
 
-use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use CrowdStar\Backoff\AbstractRetryCondition;
 use CrowdStar\VerticaSwooleAdapter\VerticaProxy;
 use Exception;
@@ -66,7 +65,13 @@ class RetryCondition extends AbstractRetryCondition
                 }
             }
 
-            Bugsnag::notifyException($e);
+            $this->proxy->logError(
+                'Vertica operation failed due to: ' . $e->getMessage(),
+                [
+                    'code'  => $e->getCode(),
+                    'class' => get_class($e),
+                ]
+            );
 
             throw $e;
         }

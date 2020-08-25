@@ -20,10 +20,10 @@ declare(strict_types=1);
 
 namespace CrowdStar\VerticaSwooleAdapter;
 
-use Bugsnag\BugsnagLaravel\Facades\Bugsnag;
 use CrowdStar\Backoff\ExponentialBackoff;
 use CrowdStar\VerticaSwooleAdapter\RetryConditions\CloseConnectionCondition;
 use CrowdStar\VerticaSwooleAdapter\RetryConditions\RetryCondition;
+use Psr\Log\LoggerInterface;
 use Swoole\ObjectProxy;
 use Throwable;
 
@@ -40,6 +40,11 @@ class VerticaProxy extends ObjectProxy
     protected $constructor;
 
     /**
+     * @var LoggerInterface
+     */
+    protected $logger;
+
+    /**
      * VerticaProxy constructor.
      *
      * @param callable $constructor
@@ -53,7 +58,13 @@ class VerticaProxy extends ObjectProxy
     public function reconnect(?Throwable $t = null): void
     {
         if (!empty($t)) {
-            // Bugsnag::notifyException($t);
+            $this->logError(
+                'Reconnecting to Vertica due to: ' . $t->getMessage(),
+                [
+                    'code'  => $t->getCode(),
+                    'class' => get_class($t),
+                ]
+            );
         }
 
         // It "seems" that from a single process there is only one DB connection that could be made (according to what
@@ -84,5 +95,21 @@ class VerticaProxy extends ObjectProxy
                 return parent::__call($name, $arguments);
             }
         );
+    }
+
+    public function logError(string $message, array $context = []): self
+    {
+        if (isset($this->logger)) {
+            $this->logger->error($message, $context);
+        }
+
+        return $this;
+    }
+
+    public function setLogger(LoggerInterface $logger): self
+    {
+        $this->logger = $logger;
+
+        return $this;
     }
 }
