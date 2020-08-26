@@ -18,10 +18,10 @@
  *************************************************************************/
 
 /**
- * Sample code to show how to make a query against the Vertica database server using connection pool.
+ * This script shows how to make a query against the Vertica database server using connection pool.
  *
  * Usage:
- *     docker exec -ti $(docker ps -qf "name=app") ./examples/example0.php
+ *     docker exec -ti $(docker ps -qf "name=app") ./examples/example.php
  */
 
 declare(strict_types=1);

@@ -18,10 +18,10 @@
  *************************************************************************/
 
 /**
- * Sample code to show that the Vertica DB adapter is not coroutine-friendly.
+ * To check if the Vertica DB adapter is coroutine-friendly or not.
  *
  * Usage:
- *     docker exec -ti $(docker ps -qf "name=app") ./examples/example1.php
+ *     docker exec -ti $(docker ps -qf "name=app") ./examples/test-coroutine-capability.php
  */
 
 declare(strict_types=1);

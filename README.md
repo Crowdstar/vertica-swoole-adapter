@@ -62,7 +62,7 @@ docker-compose up --build -d # or "docker-compose up -d" if you don't need to re
 Once done, you can run the example(s) using following command(s):
 
 ```bash
-docker exec -ti $(docker ps -qf "name=app") ./examples/benchmark.php # To run the benchmark script.
-docker exec -ti $(docker ps -qf "name=app") ./examples/example0.php  # To run example ./examples/example0.php.
-docker exec -ti $(docker ps -qf "name=app") ./examples/example1.php  # To run example ./examples/example1.php.
+docker exec -ti $(docker ps -qf "name=app") ./examples/example.php
+docker exec -ti $(docker ps -qf "name=app") ./examples/benchmark.php
+docker exec -ti $(docker ps -qf "name=app") ./examples/test-coroutine-capability.php
 ```

@@ -66,13 +66,14 @@ Coroutine\run(function () {
             $conn = $pool->get();
             $conn->fetchOne($conn->query('SELECT ' . rand()));
             $pool->put($conn);
+            echo '.';
             $wg->done();
         });
     }
     $wg->wait();
     $pool->close();
     $time = microtime(true) - $start;
-    echo "Use connection pool:   {$time} seconds. ({$numOfQueries} queries, with a pool of size {$poolSize})\n";
+    echo "\nUse connection pool: {$time} seconds. ({$numOfQueries} queries, with a pool of size {$poolSize})\n";
 
     $start = microtime(true);
     for ($i = 0; $i < $numOfQueries; $i++) {
@@ -88,7 +89,8 @@ Coroutine\run(function () {
         $conn->fetchOne($conn->query('SELECT ' . rand()));
         $conn->closeConnection();
         unset($conn);
+        echo '.';
     }
     $time = microtime(true) - $start;
-    echo "Blocking queries only: {$time} seconds. ({$numOfQueries} queries)\n";
+    echo "\nBlocking queries only: {$time} seconds. ({$numOfQueries} queries)\n";
 });
