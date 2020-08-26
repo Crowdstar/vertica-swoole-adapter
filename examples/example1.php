@@ -18,10 +18,10 @@
  *************************************************************************/
 
 /**
- * Sample code to show how to make a query against the Vertica database server using connection pool.
+ * Sample code to show that the Vertica DB adapter is not coroutine-friendly.
  *
  * Usage:
- *     docker exec -ti $(docker ps -qf "name=app") ./examples/example0.php
+ *     docker exec -ti $(docker ps -qf "name=app") ./examples/example1.php
  */
 
 declare(strict_types=1);
@@ -30,10 +30,14 @@ use CrowdStar\VerticaSwooleAdapter\VerticaAdapter;
 use CrowdStar\VerticaSwooleAdapter\VerticaProxy;
 use Swoole\ConnectionPool;
 use Swoole\Coroutine;
+use Swoole\Coroutine\WaitGroup;
+use Swoole\Runtime;
 
 require_once dirname(__DIR__) . '/vendor/autoload.php';
 
+Runtime::setHookFlags(SWOOLE_HOOK_ALL);
 Coroutine\run(function () {
+    $coroutineFriendly = null;
     $pool = new ConnectionPool(
         function () {
             return new VerticaAdapter(
@@ -50,10 +54,32 @@ Coroutine\run(function () {
         VerticaProxy::class
     );
 
-    /** @var VerticaAdapter $conn */
-    $conn = $pool->get();
-    $data = $conn->fetchOne($conn->query('SELECT version()'));
-    $pool->put($conn);
+    $wg = new WaitGroup();
+    $wg->add(2);
+    go(function () use ($pool, $wg, &$coroutineFriendly) {
+        /** @var VerticaAdapter $conn */
+        $conn = $pool->get();
+        $conn->fetchOne($conn->query('SELECT ' . rand()));
 
-    echo "Vertica version: ", $data[0]['version'], "\n";
+        // If the Vertica adapter is coroutine-friendly, this assignment statement should be executed after the one in
+        // the 2nd coroutine, and have variable $coroutineFriendly finally set to TRUE.
+        $coroutineFriendly = true;
+
+        $pool->put($conn);
+        $pool->close();
+        $wg->done();
+    });
+
+    go(function () use ($wg, &$coroutineFriendly) {
+        $coroutineFriendly = false;
+        $wg->done();
+    });
+
+    $wg->wait();
+
+    if ($coroutineFriendly) {
+        echo "The Vertica adapter is coroutine-friendly.\n";
+    } else {
+        echo "The Vertica adapter is not coroutine-friendly.\n";
+    }
 });

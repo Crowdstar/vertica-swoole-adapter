@@ -15,6 +15,7 @@ Features supported:
 * Logging support.
 
 Vertica connections are made through package [skatrych/vertica-php-adapter](https://github.com/skatrych/vertica-php-adapter), which is implemented using ODBC.
+It is not coroutine-friendly, and works in blocking mode only.
 
 This package was derived from our work at [Glu Mobile](https://www.glu.com). It has been used in one of our internal microservices talking to Vertica 7.2.0
 and 9.3.0 servers, and ran smoothly for months.
@@ -61,5 +62,7 @@ docker-compose up --build -d # or "docker-compose up -d" if you don't need to re
 Once done, you can run the example(s) using following command(s):
 
 ```bash
-docker exec -ti $(docker ps -qf "name=app") ./examples/example0.php # To run example ./examples/example0.php.
+docker exec -ti $(docker ps -qf "name=app") ./examples/benchmark.php # To run the benchmark script.
+docker exec -ti $(docker ps -qf "name=app") ./examples/example0.php  # To run example ./examples/example0.php.
+docker exec -ti $(docker ps -qf "name=app") ./examples/example1.php  # To run example ./examples/example1.php.
 ```
