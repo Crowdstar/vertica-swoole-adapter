@@ -13,7 +13,7 @@ jobs:
         run: |
           docker-compose up -d
           docker ps -a
-          docker run --rm -v "$(pwd)":/var/www -t phpswoole/swoole:latest-dev composer install -n
+          docker run --rm -v "$(pwd)":/var/www -t phpswoole/swoole:php7.4-dev composer install -n
 
       - name: Run Coding Style Checks
         run: docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 phpcs -v --standard=PSR12 examples src tests
