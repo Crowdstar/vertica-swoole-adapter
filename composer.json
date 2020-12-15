@@ -1,6 +1,6 @@
 {
     "name": "crowdstar/vertica-swoole-adapter",
-    "description": "Provides a Db layer for Swoole-based application to communicate to HP Vertica databases.",
+    "description": "Provides a DB layer for Swoole-based application to communicate to HP Vertica databases.",
     "keywords": [
         "vertica",
         "swoole"

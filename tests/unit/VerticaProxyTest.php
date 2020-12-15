@@ -53,6 +53,7 @@ class VerticaProxyTest extends TestCase
             $pool->close();
         });
     }
+
     /**
      * @covers VerticaProxy::reconnect
      */
