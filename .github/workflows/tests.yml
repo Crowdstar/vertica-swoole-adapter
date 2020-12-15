@@ -1,0 +1,32 @@
+name: Tests
+
+on: [ push, pull_request, workflow_dispatch ]
+
+jobs:
+  tests:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+
+      - name: Setup Services
+        run: |
+          docker-compose up -d
+          docker ps -a
+          docker run --rm -v "$(pwd)":/var/www -t phpswoole/swoole:latest-dev composer install -n
+
+      - name: Run Coding Style Checks
+        run: docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 phpcs -v --standard=PSR12 examples src tests
+
+      - name: Run Syntax Checks
+        run: |
+          docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.1 parallel-lint examples src tests
+          docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.2 parallel-lint examples src tests
+          docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.3 parallel-lint examples src tests
+          docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 parallel-lint examples src tests
+
+      - name: Run Unit Tests
+        run: docker exec -t $(docker ps -qf "name=app") ./vendor/bin/phpunit
+
+      - name: Stop and Remove Docker Containers
+        run: docker-compose down

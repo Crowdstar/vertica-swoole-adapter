@@ -1,4 +1,4 @@
-[![Build Status](https://travis-ci.org/Crowdstar/vertica-swoole-adapter.svg?branch=master)](https://travis-ci.org/Crowdstar/vertica-swoole-adapter)
+[![Tests](https://github.com/Crowdstar/vertica-swoole-adapter/workflows/Tests/badge.svg)](https://github.com/Crowdstar/vertica-swoole-adapter/actions)
 [![Latest Stable Version](https://poser.pugx.org/Crowdstar/vertica-swoole-adapter/v/stable.svg)](https://packagist.org/packages/crowdstar/vertica-swoole-adapter)
 [![Latest Unstable Version](https://poser.pugx.org/Crowdstar/vertica-swoole-adapter/v/unstable.svg)](https://packagist.org/packages/crowdstar/vertica-swoole-adapter)
 [![License](https://poser.pugx.org/Crowdstar/vertica-swoole-adapter/license.svg)](https://packagist.org/packages/crowdstar/vertica-swoole-adapter)
