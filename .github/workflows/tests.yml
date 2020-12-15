@@ -16,14 +16,14 @@ jobs:
           docker run --rm -v "$(pwd)":/var/www -t phpswoole/swoole:php7.4-dev composer install -n
 
       - name: Run Coding Style Checks
-        run: docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 phpcs -v --standard=PSR12 examples src tests
+        run: docker run --rm -v "$(pwd)":/project -w /project -t jakzal/phpqa:php7.4 phpcs -v --standard=PSR12 examples src tests
 
       - name: Run Syntax Checks
         run: |
-          docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.1 parallel-lint examples src tests
-          docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.2 parallel-lint examples src tests
-          docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.3 parallel-lint examples src tests
-          docker run --rm -v "$(pwd)":/project -w /project -ti jakzal/phpqa:php7.4 parallel-lint examples src tests
+          docker run --rm -v "$(pwd)":/project -w /project -t jakzal/phpqa:php7.1 parallel-lint examples src tests
+          docker run --rm -v "$(pwd)":/project -w /project -t jakzal/phpqa:php7.2 parallel-lint examples src tests
+          docker run --rm -v "$(pwd)":/project -w /project -t jakzal/phpqa:php7.3 parallel-lint examples src tests
+          docker run --rm -v "$(pwd)":/project -w /project -t jakzal/phpqa:php7.4 parallel-lint examples src tests
 
       - name: Run Unit Tests
         run: docker exec -t $(docker ps -qf "name=app") ./vendor/bin/phpunit
