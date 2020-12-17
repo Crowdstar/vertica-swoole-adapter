@@ -77,12 +77,15 @@ class VerticaProxy extends ObjectProxy
         // Here we should call $adapter->closeConnection() instead of $this->closeConnection() to avoid
         // infinite loop (caused by exponential backoff in method $this->__call().
         /** @var VerticaAdapter $adapter */
-        $adapter = $this->__getObject();
-        (new ExponentialBackoff(new CloseConnectionCondition($adapter)))->setMaxAttempts(3)->run(
-            function () use ($adapter) {
-                $adapter->closeConnection();
-            }
-        );
+        $adapter   = $this->__getObject();
+        $condition = new CloseConnectionCondition($adapter);
+        if (!$condition->met(null, null)) { // If the connection is open.
+            (new ExponentialBackoff($condition))->setMaxAttempts(3)->run(
+                function () use ($adapter) {
+                    $adapter->closeConnection();
+                }
+            );
+        }
 
         $constructor = $this->constructor;
         parent::__construct($constructor());
