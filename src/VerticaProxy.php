@@ -45,6 +45,13 @@ class VerticaProxy extends ObjectProxy
     protected $logger;
 
     /**
+     * Maximum # of attempts when retrying Vertica operations through exponential backoff.
+     *
+     * @var int
+     */
+    protected $maxAttempts = 1;
+
+    /**
      * VerticaProxy constructor.
      *
      * @param callable $constructor
@@ -80,7 +87,7 @@ class VerticaProxy extends ObjectProxy
         $adapter   = $this->__getObject();
         $condition = new CloseConnectionCondition($adapter);
         if (!$condition->met(null, null)) { // If the connection is open.
-            (new ExponentialBackoff($condition))->setMaxAttempts(3)->run(
+            (new ExponentialBackoff($condition))->setMaxAttempts($this->maxAttempts)->run(
                 function () use ($adapter) {
                     $adapter->closeConnection();
                 }
@@ -93,7 +100,7 @@ class VerticaProxy extends ObjectProxy
 
     public function __call(string $name, array $arguments)
     {
-        return (new ExponentialBackoff(new RetryCondition($this)))->setMaxAttempts(3)->run(
+        return (new ExponentialBackoff(new RetryCondition($this)))->setMaxAttempts($this->maxAttempts)->run(
             function () use ($name, $arguments) {
                 return parent::__call($name, $arguments);
             }
@@ -112,6 +119,13 @@ class VerticaProxy extends ObjectProxy
     public function setLogger(LoggerInterface $logger): self
     {
         $this->logger = $logger;
+
+        return $this;
+    }
+
+    public function setMaxAttempts(int $maxAttempts): self
+    {
+        $this->maxAttempts = $maxAttempts;
 
         return $this;
     }
