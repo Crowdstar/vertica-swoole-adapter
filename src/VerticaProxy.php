@@ -49,7 +49,7 @@ class VerticaProxy extends ObjectProxy
      *
      * @var int
      */
-    protected $maxAttempts = 1;
+    protected $maxAttempts = 2;
 
     /**
      * VerticaProxy constructor.
