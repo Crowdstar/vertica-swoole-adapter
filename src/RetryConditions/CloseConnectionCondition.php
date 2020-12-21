@@ -42,6 +42,8 @@ class CloseConnectionCondition extends AbstractRetryCondition
      */
     public function met($result, ?Exception $e): bool
     {
-        return ('odbc link' !== get_resource_type($this->adapter->getConnection()));
+        $connection = $this->adapter->getConnection();
+
+        return !is_resource($connection) || ('odbc link' !== get_resource_type($connection));
     }
 }
